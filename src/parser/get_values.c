@@ -74,11 +74,11 @@ char	*get_word_value(t_list *lst, t_main *mi)
 	return (word);
 }
 
-static void	helper1(t_list *lst, t_cmdinfo *cmd, t_main *mi)
+static t_list	*helper1(t_list *lst, t_cmdinfo *cmd, t_main *mi)
 {
 	if (lst->type == REDIR_IN)
 	{
-		if (lst->next->type == SPACES)
+		while (lst->next->type == SPACES)
 			lst = lst->next;
 		cmd->file_in = get_word_value(lst->next, mi);
 		if (!cmd->file_in)
@@ -86,20 +86,21 @@ static void	helper1(t_list *lst, t_cmdinfo *cmd, t_main *mi)
 	}
 	else if (lst->type == REDIR_APPEND)
 	{
-		if (lst->next->type == SPACES)
+		while (lst->next->type == SPACES)
 			lst = lst->next;
 		cmd->file_out = get_word_value(lst->next, mi);
 		cmd->chmod = 2;
 		if (!cmd->file_out)
 			error_syntax(0);
 	}
+	return (lst->next);
 }
 
 t_list	*get_redirect(t_list *lst, t_cmdinfo *cmd, t_main *mi)
 {
 	if (lst->type == HEREDOC)
 	{
-		if (lst->next->type == SPACES)
+		while (lst->next->type == SPACES)
 			lst = lst->next;
 		cmd->delim = get_word_value(lst->next, mi);
 		if (!cmd->delim)
@@ -107,7 +108,7 @@ t_list	*get_redirect(t_list *lst, t_cmdinfo *cmd, t_main *mi)
 	}
 	else if (lst->type == REDIR_OUT)
 	{
-		if (lst->next->type == SPACES)
+		while (lst->next->type == SPACES)
 			lst = lst->next;
 		cmd->file_out = get_word_value(lst->next, mi);
 		cmd->chmod = 1;
@@ -115,6 +116,6 @@ t_list	*get_redirect(t_list *lst, t_cmdinfo *cmd, t_main *mi)
 			error_syntax(0);
 	}
 	else
-		helper1(lst, cmd, mi);
+		return (helper1(lst, cmd, mi));
 	return (lst->next);
 }
